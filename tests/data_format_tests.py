@@ -35,7 +35,7 @@ class GenericDataFormatTestCase(unittest.TestCase):
     def check_topic_and_origin(self, cts_message, expected_topic, expected_origin):
         """Assert that both topic and origin are correct.
 
-        :param cts_message: CTSMsg instance
+        :param cts_message: Envelope instance
         :param expected_topic: str
         :param expected_origin: str
         :return:
@@ -53,7 +53,7 @@ class GenericDataFormatTestCase(unittest.TestCase):
 
         :param data_node: Node Object to test
         :param topics: bytes object, defines topic string
-        :return: CTSMsg
+        :return: Envelope
         """
         cts_msg = self.get_cts_msg(data_node, topics)
         self.assertIsInstance(cts_msg.data, Book)
@@ -89,7 +89,7 @@ class GenericDataFormatTestCase(unittest.TestCase):
 
         :param data_node: Node Object to test
         :param topics: bytes object, defines topic string
-        :return: CTSMsg
+        :return: Envelope
         """
         cts_msg = self.get_cts_msg(data_node, topics)
         self.assertIsInstance(cts_msg.data, RawBook)
@@ -124,7 +124,7 @@ class GenericDataFormatTestCase(unittest.TestCase):
 
         :param data_node: Node Object to test
         :param topics: bytes object, defines topic string
-        :return: CTSMsg
+        :return: Envelope
         """
         cts_msg = self.get_cts_msg(data_node, topics)
         self.assertIsInstance(cts_msg.data, TopLevel)
@@ -156,7 +156,7 @@ class GenericDataFormatTestCase(unittest.TestCase):
 
         :param data_node: Node Object to test
         :param topics: bytes object, defines topic string
-        :return: CTSMsg
+        :return: Envelope
         """
         cts_msg = self.get_cts_msg(data_node, topics)
         self.assertIsInstance(cts_msg.data, Candle)

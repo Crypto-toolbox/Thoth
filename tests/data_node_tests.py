@@ -5,7 +5,7 @@ import zmq
 
 from utils import mocked_publisher, mocked_wss
 
-from hermes.structs import CTSMsg, Trades, TopLevel, Book, RawBook, Candle
+from hermes.structs import Envelope, Trades, TopLevel, Book, RawBook, Candle
 
 from thoth import DataNode
 
@@ -38,7 +38,7 @@ class DataNodeTests(unittest.TestCase):
         # assert that the publisher's publish() method was called.
         self.assertTrue(fake_publisher.publish.called)
         cts_msg = fake_publisher.publish.call_args[0][0]
-        self.assertIsInstance(cts_msg, CTSMsg)
+        self.assertIsInstance(cts_msg, Envelope)
         self.assertEqual(cts_msg.topic, 'raw/TestNode')
         self.assertEqual(cts_msg.origin, 'TestNode')
         self.assertEqual(cts_msg.data, 'test_data')
@@ -54,7 +54,7 @@ class DataNodeTests(unittest.TestCase):
         # assert that the publisher's publish() method was called.
         self.assertTrue(fake_publisher.publish.called)
         cts_msg = fake_publisher.publish.call_args[0][0]
-        self.assertIsInstance(cts_msg, CTSMsg)
+        self.assertIsInstance(cts_msg, Envelope)
         self.assertEqual(cts_msg.topic, 'Book/TESTPAIR/TestNode')
         self.assertEqual(cts_msg.origin, 'TestNode')
         self.assertIsInstance(cts_msg.data, Book)
@@ -94,7 +94,7 @@ class DataNodeTests(unittest.TestCase):
         # assert that the publisher's publish() method was called.
         self.assertTrue(fake_publisher.publish.called)
         cts_msg = fake_publisher.publish.call_args[0][0]
-        self.assertIsInstance(cts_msg, CTSMsg)
+        self.assertIsInstance(cts_msg, Envelope)
         self.assertEqual(cts_msg.topic, 'RawBook/TESTPAIR/TestNode')
         self.assertEqual(cts_msg.origin, 'TestNode')
         self.assertIsInstance(cts_msg.data, RawBook)
@@ -129,7 +129,7 @@ class DataNodeTests(unittest.TestCase):
         # assert that the publisher's publish() method was called.
         self.assertTrue(fake_publisher.publish.called)
         cts_msg = fake_publisher.publish.call_args[0][0]
-        self.assertIsInstance(cts_msg, CTSMsg)
+        self.assertIsInstance(cts_msg, Envelope)
         self.assertEqual(cts_msg.topic, 'TopLevel/TESTPAIR/TestNode')
         self.assertEqual(cts_msg.origin, 'TestNode')
         self.assertIsInstance(cts_msg.data, TopLevel)
@@ -158,7 +158,7 @@ class DataNodeTests(unittest.TestCase):
         # assert that the publisher's publish() method was called.
         self.assertTrue(fake_publisher.publish.called)
         cts_msg = fake_publisher.publish.call_args[0][0]
-        self.assertIsInstance(cts_msg, CTSMsg)
+        self.assertIsInstance(cts_msg, Envelope)
         self.assertEqual(cts_msg.topic, 'Candle/TESTPAIR/TestNode')
         self.assertEqual(cts_msg.origin, 'TestNode')
         self.assertIsInstance(cts_msg.data, Candle)
@@ -202,7 +202,7 @@ class DataNodeTests(unittest.TestCase):
         # assert that the publisher's publish() method was called.
         self.assertTrue(fake_publisher.publish.called)
         cts_msg = fake_publisher.publish.call_args[0][0]
-        self.assertIsInstance(cts_msg, CTSMsg)
+        self.assertIsInstance(cts_msg, Envelope)
         self.assertEqual(cts_msg.topic, 'Trades/TestNode')
         self.assertEqual(cts_msg.origin, 'TestNode')
         self.assertIsInstance(cts_msg.data, Trades)
