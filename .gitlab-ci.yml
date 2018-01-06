@@ -1,0 +1,30 @@
+image: nlsdfnbch/python-zmq:4.2.2-data
+
+stages:
+  - linting
+  - testing
+
+execute_pep8_linter:
+  stage: linting
+  script:
+  - python3 setup.py install
+  - pylint --rcfile=pylint.rc thoth/
+
+execute_codestyle_linter:
+  stage: linting
+  script:
+  - python3 setup.py install
+  - pycodestyle --max-line-length=100 thoth/
+
+execute_docstyle_linter:
+  stage: linting
+  script:
+  - python3 setup.py install
+  - pydocstyle thoth
+
+execute_tests:
+  stage: testing
+  script:
+  - python setup.py install
+  - coverage run tests/data_node_tests.py
+  - coverage report
