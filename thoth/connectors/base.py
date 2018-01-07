@@ -343,7 +343,7 @@ class WebSocketConnectorProcess(WebSocketConnector, mp.Process):
 
 
 class PusherConnector(Pusher):
-    """Websocket Connector for the Pusher-based Bitstamp API."""
+    """Websocket Connector for Pusher-based APIs."""
 
     def __init__(self, pairs, *args, **kwargs):
         """Initialize Connector."""
