@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 class DataNode(Node):
     """Provides a websocket interface and publisher.
 
-    the topic tree are built as follows:
+    the topic tree is built as follows:
         <dtype>/<pair (if applicable)>/<node name>
     """
 
