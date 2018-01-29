@@ -4,7 +4,7 @@ import time
 import logging
 import json
 
-from thoth.connectors.base import PusherConnector
+from thoth.core.pusher import PusherConnector
 
 log = logging.getLogger(__name__)
 

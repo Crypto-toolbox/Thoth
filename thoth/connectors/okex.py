@@ -4,7 +4,7 @@ import logging
 from threading import Timer
 
 
-from thoth.connectors.base import WebSocketConnectorThread
+from thoth.connectors.base import WebsocketConnector
 
 
 log = logging.getLogger(__name__)
@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 # pylint: disable=duplicate-code
 
 
-class OKExConnector(WebSocketConnectorThread):
+class OKExConnector(WebsocketConnector):
     """Class to pre-process HitBTC data, before passing it up to a Node."""
 
     def __init__(self, **conn_ops):

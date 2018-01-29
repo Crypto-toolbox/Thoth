@@ -3,12 +3,12 @@
 import time
 import logging
 from threading import Timer
-from thoth.connectors.base import WebSocketConnectorThread
+from thoth.connectors.base import WebsocketConnector
 
 log = logging.getLogger(__name__)
 
 
-class GeminiConnector(WebSocketConnectorThread):
+class GeminiConnector(WebsocketConnector):
     """Gemini Websocket Connector."""
 
     def __init__(self, pair, **conn_ops):

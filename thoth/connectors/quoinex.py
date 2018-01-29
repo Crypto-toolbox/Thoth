@@ -3,7 +3,7 @@
 import logging
 import requests
 
-from thoth.connectors.base import PusherConnector
+from thoth.core.pusher import PusherConnector
 
 
 log = logging.getLogger(__name__)

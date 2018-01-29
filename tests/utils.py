@@ -2,7 +2,7 @@
 from unittest import mock
 
 from hermes.publisher import Publisher
-from thoth.connectors import WebSocketConnectorThread
+from thoth.core.websocket import WebsocketConnector
 
 
 def mocked_publisher():
@@ -12,4 +12,4 @@ def mocked_publisher():
 
 
 def mocked_wss():
-    return mock.Mock(spec=WebSocketConnectorThread)
+    return mock.Mock(spec=WebsocketConnector)

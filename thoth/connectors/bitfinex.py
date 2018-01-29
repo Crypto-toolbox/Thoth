@@ -10,12 +10,12 @@ from collections import OrderedDict
 import websocket
 
 # Import Homebrew
-from thoth.connectors import WebSocketConnectorThread
+from thoth.core.websocket import WebsocketConnector
 # Init Logging Facilities
 log = logging.getLogger(__name__)
 
 
-class WebSocketConnection(WebSocketConnectorThread):
+class BitfinexConnector(WebsocketConnector):
     """Websocket Connection Thread
 
     Inspired heavily by ekulyk's PythonPusherClient Connection Class

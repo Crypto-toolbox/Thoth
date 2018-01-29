@@ -5,12 +5,12 @@ import logging
 import hmac
 import hashlib
 from threading import Timer
-from thoth.connectors.base import WebSocketConnectorThread
+from thoth.connectors.base import WebsocketConnector
 
 log = logging.getLogger(__name__)
 
 
-class CEXIOConnector(WebSocketConnectorThread):
+class CEXIOConnector(WebsocketConnector):
     """CEX.io Websocket Connector."""
 
     def __init__(self, key, secret, **conn_ops):

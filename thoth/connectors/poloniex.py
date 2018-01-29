@@ -5,7 +5,7 @@ from threading import Timer
 
 import requests
 
-from thoth.connectors.base import WebSocketConnectorThread
+from thoth.connectors.base import WebsocketConnector
 
 
 log = logging.getLogger(__name__)
@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 # pylint: disable=duplicate-code
 
 
-class PoloniexConnector(WebSocketConnectorThread):
+class PoloniexConnector(WebsocketConnector):
     """Class to pre-process HitBTC data, before passing it up to a Node."""
 
     def __init__(self, **conn_ops):
