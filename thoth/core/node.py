@@ -65,8 +65,6 @@ class DataNode(Node):
                         self.publish_trades(data)
                     elif dtype == 'Quote':
                         self.publish_quote(data)
-                    elif dtype == 'Quotes':
-                        self.publish_quotes(data)
                     else:
                         pass
                 except ValueError as e:
