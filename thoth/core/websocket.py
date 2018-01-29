@@ -1,10 +1,14 @@
-"""Websocket Connector Base class."""
+"""Websocket Connector Base class.
+
+Uses zeromq to pass data upward, using PUSH/PULL.
+
+Passes data without touching it.
+"""
 
 # pylint: disable=too-many-arguments
 
 # Import Built-Ins
 import logging
-from queue import Queue
 from threading import Thread, Timer
 
 import json
@@ -13,6 +17,7 @@ import ssl
 
 # Import Third-Party
 import websocket
+import zmq
 
 # Import home-grown
 
@@ -21,20 +26,16 @@ log = logging.getLogger(__name__)
 
 
 class WebSocketConnector(Thread):
-    """Websocket Connection Thread.
-
-    Inspired heavily by ekulyk's PythonPusherClient Connection Class
-    https://github.com/ekulyk/PythonPusherClient/blob/master/pusherclient/connection.py
-
-    Data received is available by calling WebSocketConnection.recv()
-    """
+    """Websocket Connection Thread."""
 
     # pylint: disable=too-many-instance-attributes, too-many-arguments,unused-argument
 
-    def __init__(self, url, timeout=None, q_maxsize=None, reconnect_interval=None, log_level=None):
+    def __init__(self, url, zmq_addr, timeout=None, reconnect_interval=None, log_level=None,
+                 ctx=None):
         """Initialize a WebSocketConnector Instance.
 
         :param url: websocket address, defaults to v2 websocket.
+        :param zmq_addr: address for zmq socket to bind to.
         :param timeout: timeout for connection; defaults to 10s
         :param reconnect_interval: interval at which to try reconnecting;
                                    defaults to 10s.
@@ -44,7 +45,9 @@ class WebSocketConnector(Thread):
         :param kwargs: kwargs for Thread.__ini__()
         """
         # Queue used to pass data up to Node
-        self.q = Queue(maxsize=-1 if not q_maxsize else q_maxsize)
+        self.ctx = ctx or zmq.Context()
+        self.q = self.ctx.socket(zmq.PUSH)
+        self.zmq_addr = zmq_addr or 'ipc:///tmp/wss'
 
         # Connection Settings
         self.url = url
@@ -57,22 +60,13 @@ class WebSocketConnector(Thread):
         self.reconnect_interval = reconnect_interval if reconnect_interval else 10
         self.paused = False
 
-        # Setup Timer attributes
-        # Tracks API Connection & Responses
-        self.ping_timer = None
-        self.ping_interval = 120
 
         # Set up history of sent commands for re-subscription
         self.history = []
 
-        # Tracks Websocket Connection
+        # Setup timer attributes
         self.connection_timer = None
         self.connection_timeout = timeout if timeout else 10
-
-        # Tracks responses from send_ping()
-        self.pong_timer = None
-        self.pong_received = False
-        self.pong_timeout = 30
 
         self.log = logging.getLogger(self.__module__)
         self.log.setLevel(level=log_level if log_level else logging.INFO)
@@ -88,6 +82,10 @@ class WebSocketConnector(Thread):
         super(WebSocketConnector, self).__init__()
         self.daemon = True
 
+    def start(self):
+        self.q.bind(self.zmq_addr)
+        self._connect()
+
     def stop(self, timeout=None):
         """Wrap around disconnect().
 
@@ -96,7 +94,8 @@ class WebSocketConnector(Thread):
         :return:
         """
         self.disconnect()
-        self.join(self, timeout)
+        self.q.close()
+        super(WebSocketConnector, self).join(self, timeout)
 
     def disconnect(self):
         """Disconnect from the websocket connection and joins the Thread."""
@@ -129,6 +128,7 @@ class WebSocketConnector(Thread):
 
         ssl_defaults = ssl.get_default_verify_paths()
         sslopt_ca_certs = {'ca_certs': ssl_defaults.cafile}
+        self._is_connected =
         self.conn.run_forever(sslopt=sslopt_ca_certs)
 
         while self.reconnect_required:
@@ -158,20 +158,11 @@ class WebSocketConnector(Thread):
         """
         self._stop_timers()
 
-        raw, received_at = message, time.time()
-
         try:
-            data = json.loads(raw)
-        except json.JSONDecodeError as e:
-            # Something wrong with this data, log and discard
-            self.log.exception("Exception %s for data %s; Discarding..", e, raw)
-            return
-
-        try:
-            self.pass_up(data, received_at)
+            self.push(message, time.time())
         except Exception as e:
             log.exception(e)
-            log.error(data)
+            log.error(message)
             raise
 
         # We've received data, reset timers
@@ -202,7 +193,6 @@ class WebSocketConnector(Thread):
         """
         self.log.info("Connection opened")
         self._is_connected = True
-        self.send_ping()
         self._start_timers()
         if self.reconnect_required:
             self.log.info("Reconnection successful, re-subscribing to"
@@ -227,43 +217,18 @@ class WebSocketConnector(Thread):
         self.reconnect_required = True
 
     def _stop_timers(self):
-        """Stop ping, pong and connection timers."""
-        if self.ping_timer:
-            self.ping_timer.cancel()
-
+        """Stop connection timers."""
         if self.connection_timer:
             self.connection_timer.cancel()
-
-        if self.pong_timer:
-            self.pong_timer.cancel()
 
     def _start_timers(self):
         """Reset and start timers for API data and connection."""
         self._stop_timers()
 
-        # Sends a ping at ping_interval to see if API still responding
-        self.ping_timer = Timer(self.ping_interval, self.send_ping)
-        self.ping_timer.start()
-
         # Automatically reconnect if we didnt receive data
         self.connection_timer = Timer(self.connection_timeout,
                                       self._connection_timed_out)
         self.connection_timer.start()
-
-    def send_ping(self):
-        """Send a ping message to the API and starts pong timers."""
-        self.conn.send(json.dumps({'event': 'ping'}))
-        self.pong_timer = Timer(self.pong_timeout, self._check_pong)
-        self.pong_timer.start()
-
-    def _check_pong(self):
-        """Check if a Pong message was received."""
-        self.pong_timer.cancel()
-        if self.pong_received:
-            self.pong_received = False
-        else:
-            # reconnect
-            self.reconnect()
 
     def send(self, data):
         """Send the given Payload to the API via the websocket connection.
@@ -280,27 +245,16 @@ class WebSocketConnector(Thread):
         else:
             log.error("Cannot send payload! Connection not established!")
 
-    def pass_up(self, data, recv_at):
+    def push(self, data, recv_at):
         """Pass data up to the client via the internal Queue().
 
-        :param data: data to be passed up
+        :param data: data to be pushed
         :param recv_at: float, time of reception
         :return:
         """
-        self.q.put(data, recv_at)
-
-    def recv(self, block=True, timeout=None):
-        """Wrap for self.q.get().
-
-        :param block: Whether or not to make the call to this method block
-        :param timeout: Value in seconds which determines a timeout for get()
-        :return:
-        """
-        return self.q.get(block, timeout)
+        payload = [data, recv_at]
+        self.q.send_multipart(payload)
 
     def _connection_timed_out(self):
-        """Issue a reconnection.
-
-        :return:
-        """
+        """Issue a reconnection."""
         self.reconnect()

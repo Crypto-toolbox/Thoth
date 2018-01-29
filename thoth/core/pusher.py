@@ -4,10 +4,11 @@
 
 # Import Built-Ins
 import logging
-from queue import Queue
+import time
 
 # Import Third-party
 from pysher import Pusher
+import zmq
 
 # Import home-grown
 
@@ -25,12 +26,18 @@ class PusherConnector(Pusher):
     do not have to handle several pairs, or want to handle all pairs in a single method instead.
     """
 
-    def __init__(self, pairs, *args, **kwargs):
+    def __init__(self, pairs, zmq_addr, *pusher_args, ctx=None, **pusher_kwargs):
         """Initialize Connector."""
-        super(PusherConnector, self).__init__(*args, **kwargs)
+        super(PusherConnector, self).__init__(*pusher_args, **pusher_kwargs)
         self.pairs = pairs
-        self.q = Queue(maxsize=-1)
+        self.ctx = ctx or zmq.Context()
+        self.q = self.ctx.socket(zmq.PUSH)
+        self.zmq_addr = zmq_addr
         self.connection.bind('pusher:connection_established', self._connect_channels)
+
+    def push(self, data, recv_at):
+        """Push data upwards."""
+        self.q.send_multipart([data, recv_at])
 
     def _connect_channels(self, data):
         """Connect all available channels to this connector."""
@@ -40,6 +47,7 @@ class PusherConnector(Pusher):
     def stop(self):
         """Stop the connector."""
         self.disconnect()
+        self.q.close()
 
     def start(self):
         """Start the connector."""
@@ -60,10 +68,12 @@ class PusherConnector(Pusher):
         def callback_a(data):
             """Put data on q with correct channel name."""
             print(data)
+            self.push(data, time.time())
 
         def callback_b(data):
             """Put data on q with correct channel name."""
             print(data)
+            self.push(data, time.time())
 
         channel1 = self.subscribe('Channel_A')
         channel1.bind('EVENT_NAME', callback_a)
