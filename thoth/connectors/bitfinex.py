@@ -16,13 +16,13 @@ log = logging.getLogger(__name__)
 
 
 class BitfinexConnector(WebsocketConnector):
-    """Websocket Connection Thread
-
-    Inspired heavily by ekulyk's PythonPusherClient Connection Class
-    https://github.com/ekulyk/PythonPusherClient/blob/master/pusherclient/connection.py
+    """Websocket Connection Thread For Bitfinex.
 
     It handles all low-level system messages, such a reconnects, pausing of
     activity and continuing of activity.
+
+    These can be recognized by their object type - dictionaries typically carry messages, while
+    lists contain data.
     """
     def __init__(self, url, timeout=None, reconnect_interval=None, log_level=None,
                  q_maxsize=None):
