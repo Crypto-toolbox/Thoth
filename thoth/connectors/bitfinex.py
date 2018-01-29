@@ -37,9 +37,9 @@ class BitfinexConnector(WebsocketConnector):
         :param log_level: logging level for the connection Logger. Defaults to
                           logging.INFO.
         """
-        super(WebSocketConnection, self).__init__(url, timeout=timeout, log_level=log_level,
-                                                  reconnect_interval=reconnect_interval,
-                                                  q_maxsize=q_maxsize)
+        super(BitfinexConnector, self).__init__(url, timeout=timeout, log_level=log_level,
+                                                reconnect_interval=reconnect_interval,
+                                                q_maxsize=q_maxsize)
 
         # Dict to store all subscribe commands for reconnects
         self.channel_configs = OrderedDict()
@@ -60,7 +60,7 @@ class BitfinexConnector(WebsocketConnector):
             payload = kwargs
         self.log.debug("send(): Sending payload to API: %s", payload)
         try:
-            super(WebSocketConnection, self).send(payload)
+            super(BitfinexConnector, self).send(payload)
         except websocket.WebSocketConnectionClosedException:
             self.log.error("send(): Did not send out payload %s - client not connected. ", kwargs)
 
