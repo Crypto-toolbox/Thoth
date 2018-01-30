@@ -4,7 +4,7 @@ import logging
 import json
 import time
 
-from thoth.connectors.base import WebsocketConnector
+from thoth.core.websocket import WebsocketConnector
 
 
 log = logging.getLogger(__name__)
