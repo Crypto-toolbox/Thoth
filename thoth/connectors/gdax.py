@@ -48,15 +48,4 @@ class GDAXConnector(WebSocketConnector):
             return
         super(GDAXConnector, self)._on_message(ws, (topic, data, time.time()))
 
-    def _matches(self, data, ts):
-        topic = 'matches_' + data['product_id']
-        self.push(topic, data, ts)
-
-    def _full(self, data, ts):
-        topic = 'full_order_book_' + data['product_id'] + '/' + data['type']
-        self.push(topic, data, ts)
-
-    def _hb(self, data, ts):
-
-        self.push(topic, data, ts)
 
