@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 VERSION = '1.0'
 
@@ -7,7 +7,7 @@ setup(name='thoth',
       description='Crypto Exchange Websocket Framework',
       author='Nils Diefenbach',
       author_email='23okrs20+gitlab@mykolab.com',
-      packages=['thoth', 'thoth/connectors', 'thoth/core'],
+      packages=find_packages(exclude=['contrib', 'docs', 'tests']),
       test_suite='nose.collector', tests_require=['nose', 'cython'],
       classifiers=['Development Status :: 3 - Alpha',
                    'Intended Audience :: Financial and Insurance Industry',
@@ -15,5 +15,5 @@ setup(name='thoth',
                    'Operating System :: POSIX :: Linux',
                    'Programming Language :: Python :: 3 :: Only',
                    'Topic :: Office/Business :: Financial :: Investment'],
-      install_requires=['hermes-zmq', 'pyzmq', 'requests', 'pysher'],
+      install_requires=['hermes-zmq', 'websocket-client', 'requests', 'autobahn', 'pysher'],
       package_data={'': ['*.md', '*.rst']})
