@@ -1,3 +1,5 @@
 """Module loader."""
-from thoth.data_node import DataNode
+from thoth.core.node import DataNode
+from thoth.core.pusher import PusherConnector
+from thoth.core.websocket import WebSocketConnector
 from thoth import connectors

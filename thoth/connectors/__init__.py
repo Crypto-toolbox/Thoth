@@ -1,7 +1,4 @@
 """Connector module loader."""
-from thoth.connectors.base import WebsocketConnector, WebSocketConnectorProcess
-from thoth.connectors.hitbtc import HitBTCConnector
-from thoth.connectors.gemini import GeminiConnector
+from thoth.connectors.binance import BinanceConnector
+from thoth.connectors.gdax import GDAXConnector
 from thoth.connectors.bitstamp import BitstampConnector
-from thoth.connectors.rocktrading import RockTradingConnector
-from thoth.connectors.poloniex import PoloniexConnector
