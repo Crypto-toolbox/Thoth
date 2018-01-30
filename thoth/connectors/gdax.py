@@ -4,13 +4,13 @@ import logging
 import json
 import time
 
-from thoth.core.websocket import WebsocketConnector
+from thoth.core.websocket import WebSocketConnector
 
 
 log = logging.getLogger(__name__)
 
 
-class GDAXConnector(WebsocketConnector):
+class GDAXConnector(WebSocketConnector):
     """Class to pre-process HitBTC data, before passing it up to a Node."""
     channels = ['level2', 'heartbeat', 'ticker', 'full']
 
