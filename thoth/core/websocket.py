@@ -10,6 +10,7 @@ Passes data without touching it.
 # Import Built-Ins
 import logging
 from threading import Thread, Timer
+from abc import abstractmethod
 
 import json
 import time
@@ -145,6 +146,7 @@ class WebSocketConnector(Thread):
         """Run the main method of thread."""
         self._connect()
 
+    @abstractmethod
     def _on_message(self, ws, message):
         """Handle and pass received data to the appropriate handlers.
 
@@ -153,13 +155,13 @@ class WebSocketConnector(Thread):
         All messages are time-stamped
 
         :param ws: Websocket obj
-        :param message: received data as bytes
+        :param message: tuple or list of topic, data, timestamp
         :return:
         """
         self._stop_timers()
 
         try:
-            self.push('raw', message, time.time())
+            self.push(*message)
         except Exception as e:
             log.exception(e)
             log.error(message)
