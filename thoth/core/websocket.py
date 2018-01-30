@@ -31,7 +31,7 @@ class WebSocketConnector(Thread):
 
     # pylint: disable=too-many-instance-attributes, too-many-arguments,unused-argument
 
-    def __init__(self, url, zmq_addr, timeout=None, reconnect_interval=None, log_level=None,
+    def __init__(self, url, zmq_addr=None, timeout=None, reconnect_interval=None, log_level=None,
                  ctx=None):
         """Initialize a WebSocketConnector Instance.
 
