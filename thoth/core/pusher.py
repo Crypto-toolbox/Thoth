@@ -35,9 +35,9 @@ class PusherConnector(Pusher):
         self.zmq_addr = zmq_addr
         self.connection.bind('pusher:connection_established', self._connect_channels)
 
-    def push(self, data, recv_at):
+    def push(self, topic, data, recv_at):
         """Push data upwards."""
-        self.q.send_multipart([data, recv_at])
+        self.q.send_multipart([topic, data, recv_at])
 
     def _connect_channels(self, data):
         """Connect all available channels to this connector."""
@@ -63,17 +63,17 @@ class PusherConnector(Pusher):
         return self.q.get(block, timeout)
 
     # pylint: disable=unused-argument
-    def _base_callback(self, pair, data):
+    def _base_callback(self, data, pair):
         """Put data on respective queue."""
         def callback_a(data):
             """Put data on q with correct channel name."""
             print(data)
-            self.push(data, time.time())
+            self.push('raw', data, time.time())
 
         def callback_b(data):
             """Put data on q with correct channel name."""
             print(data)
-            self.push(data, time.time())
+            self.push('raw', data, time.time())
 
         channel1 = self.subscribe('Channel_A')
         channel1.bind('EVENT_NAME', callback_a)

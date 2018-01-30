@@ -159,7 +159,7 @@ class WebSocketConnector(Thread):
         self._stop_timers()
 
         try:
-            self.push(message, time.time())
+            self.push('raw', message, time.time())
         except Exception as e:
             log.exception(e)
             log.error(message)
@@ -245,14 +245,14 @@ class WebSocketConnector(Thread):
         else:
             log.error("Cannot send payload! Connection not established!")
 
-    def push(self, data, recv_at):
+    def push(self, topic, data, recv_at):
         """Pass data up to the client via the internal Queue().
 
         :param data: data to be pushed
         :param recv_at: float, time of reception
         :return:
         """
-        payload = [data, recv_at]
+        payload = [topic, data, recv_at]
         self.q.send_multipart(payload)
 
     def _connection_timed_out(self):
