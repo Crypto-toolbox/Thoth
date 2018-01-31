@@ -253,7 +253,7 @@ class WebSocketConnector(Thread):
         :param recv_at: float, time of reception
         :return:
         """
-        payload = [topic, data, recv_at]
+        payload = [topic.encode('UTF-8'), data.encode('UTF-8'), str(recv_at).encode('UTF-8')]
         self.q.send_multipart(payload)
 
     def _connection_timed_out(self):
