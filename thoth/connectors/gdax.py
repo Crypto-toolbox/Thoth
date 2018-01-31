@@ -30,16 +30,17 @@ class GDAXConnector(WebSocketConnector):
 
     def _on_message(self, ws, data):
         message = json.loads(data)
+        print(message)
         mtype = message['type']
         if mtype in ('snapshot', 'l2update'):
-            topic = 'order_book_' + data['product_id'] + '/' + data['type']
+            topic = 'order_book_' + message['product_id'] + '/' + mtype
         elif mtype in ('ticker',):
-            topic = 'ticker_' + data['product_id']
+            topic = 'ticker_' + message['product_id']
         elif mtype in ('match','received', 'open', 'done', 'change', 'margin_profile_update',
                        'activate'):
-            topic = 'full_order_book_' + data['product_id'] + '/' + data['type']
+            topic = 'full_order_book_' + message['product_id'] + '/' + mtype
         elif mtype == 'heartbeat':
-            topic = 'heartbeat_' + data['product_id']
+            topic = 'heartbeat_' + message['product_id']
         elif mtype == 'subscription':
             log.debug(message)
             return
