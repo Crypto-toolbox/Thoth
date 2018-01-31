@@ -11,20 +11,20 @@ log = logging.getLogger(__name__)
 
 class BitstampConnector(PusherConnector):
     """Websocket Connector for the Pusher-based Bitstamp API."""
-    channel = ['live_trades%s', 'order_book%s', 'diff_order_book%s', 'live_orders%s']
+    channels = ['live_trades%s', 'order_book%s', 'diff_order_book%s', 'live_orders%s']
 
     def __init__(self, *args, **kwargs):
         """Initialize Connector."""
-        pairs = 'btceur, eurusd, xrpusd, xrpeur, xrpbtc, ltcusd, ltceur, ltcbtc, ethusd, ' \
-                'etheur, ethbtc, bchusd, bcheur, bchbtc'.strip(' ').split(',')
-        super(BitstampConnector, self).__init__(pairs, *args, **kwargs)
+        pairs = 'btceur,eurusd,xrpusd,xrpeur,xrpbtc,ltcusd,ltceur,ltcbtc,ethusd,etheur,ethbtc,' \
+                'bchusd,bcheur,bchbtc'.split(',')
+        super(BitstampConnector, self).__init__(pairs, 'ipc:///tmp/bitstamp', 'de504dc5763aeef9ff52', *args, **kwargs)
 
     # pylint: disable=unused-argument
     def _base_callback(self, data, pair):
         """Put data on respective queue."""
         pair = '' if pair == 'btcusd' else '_' + pair
 
-        trades, book, diff_book, orders = [chan % pair for chan in self.channels]
+        trades, book, diff_book, orders = [chan % pair for chan in BitstampConnector.channels]
 
         def _handle_trades(data):
             """Put data on q with correct channel name."""
