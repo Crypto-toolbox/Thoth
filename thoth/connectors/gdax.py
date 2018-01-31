@@ -30,7 +30,6 @@ class GDAXConnector(WebSocketConnector):
 
     def _on_message(self, ws, data):
         message = json.loads(data)
-        print(message)
         mtype = message['type']
         if mtype in ('snapshot', 'l2update'):
             topic = 'order_book_' + message['product_id'] + '/' + mtype
