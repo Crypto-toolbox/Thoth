@@ -33,6 +33,7 @@ class PusherConnector(Pusher):
         self.ctx = ctx or zmq.Context()
         self.q = self.ctx.socket(zmq.PUSH)
         self.zmq_addr = zmq_addr
+        self.q.bind(self.zmq_addr)
         self.connection.bind('pusher:connection_established', self._connect_channels)
 
     def push(self, topic, data, recv_at):
