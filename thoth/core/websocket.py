@@ -49,6 +49,7 @@ class WebSocketConnector(Thread):
         self.ctx = ctx or zmq.Context()
         self.q = self.ctx.socket(zmq.PUSH)
         self.zmq_addr = zmq_addr or 'ipc:///tmp/wss'
+        self.q.bind(self.zmq_addr)
 
         # Connection Settings
         self.url = url
@@ -60,7 +61,6 @@ class WebSocketConnector(Thread):
         self.reconnect_required = False
         self.reconnect_interval = reconnect_interval if reconnect_interval else 10
         self.paused = False
-
 
         # Set up history of sent commands for re-subscription
         self.history = []
@@ -84,7 +84,6 @@ class WebSocketConnector(Thread):
         self.daemon = True
 
     def start(self):
-        self.q.bind(self.zmq_addr)
         self._connect()
 
     def stop(self, timeout=None):
