@@ -26,7 +26,7 @@ class PusherConnector(Pusher):
     do not have to handle several pairs, or want to handle all pairs in a single method instead.
     """
 
-    def __init__(self, pairs, zmq_addr, *pusher_args, ctx=None, **pusher_kwargs):
+    def __init__(self, pairs, *pusher_args, ctx=None, zmq_addr=None, **pusher_kwargs):
         """Initialize Connector."""
         super(PusherConnector, self).__init__(*pusher_args, **pusher_kwargs)
         self.pairs = pairs
