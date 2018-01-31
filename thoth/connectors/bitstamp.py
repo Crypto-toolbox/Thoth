@@ -17,7 +17,7 @@ class BitstampConnector(PusherConnector):
         """Initialize Connector."""
         pairs = 'btceur,eurusd,xrpusd,xrpeur,xrpbtc,ltcusd,ltceur,ltcbtc,ethusd,etheur,ethbtc,' \
                 'bchusd,bcheur,bchbtc'.split(',')
-        super(BitstampConnector, self).__init__(pairs, 'ipc:///tmp/bitstamp', 'de504dc5763aeef9ff52', *args, **kwargs)
+        super(BitstampConnector, self).__init__(pairs, 'de504dc5763aeef9ff52', *args, **kwargs)
 
     # pylint: disable=unused-argument
     def _base_callback(self, data, pair):
