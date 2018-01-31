@@ -37,7 +37,8 @@ class PusherConnector(Pusher):
 
     def push(self, topic, data, recv_at):
         """Push data upwards."""
-        self.q.send_multipart([topic, data, recv_at])
+        payload = [topic.encode('UTF-8'), data.encode('UTF-8'), str(recv_at).encode('UTF-8')]
+        self.q.send_multipart(payload)
 
     def _connect_channels(self, data):
         """Connect all available channels to this connector."""
