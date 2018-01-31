@@ -83,9 +83,6 @@ class WebSocketConnector(Thread):
         super(WebSocketConnector, self).__init__()
         self.daemon = True
 
-    def start(self):
-        self._connect()
-
     def stop(self, timeout=None):
         """Wrap around disconnect().
 
