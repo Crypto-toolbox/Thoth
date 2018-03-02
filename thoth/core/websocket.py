@@ -156,7 +156,7 @@ class WebSocketConnector(Thread):
         self._stop_timers()
 
         try:
-            self.push(*message)
+            self.push(message)
         except Exception as e:
             log.exception(e)
             log.error(message)
