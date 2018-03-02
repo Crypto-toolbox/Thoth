@@ -43,7 +43,7 @@ class DataNode(Node):
         """
         while self._running:
             try:
-                frames = self.recv(block=False, timeout=None)
+                frames = self.recv(block=False, timeout=3)
             except (TimeoutError, queue.Empty):
                 continue
             try:
