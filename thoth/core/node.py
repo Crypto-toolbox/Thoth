@@ -51,6 +51,7 @@ class DataNode(Node):
             except ValueError as e:
                 log.exception(e)
                 log.error(msg)
+                continue
             self.process_frames(topic, data, ts)
 
     def publish_raw(self, topic, data, ts):
