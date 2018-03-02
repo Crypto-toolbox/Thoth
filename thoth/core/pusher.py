@@ -1,4 +1,9 @@
-"""Pusher Connector Base class."""
+"""Pusher Connector Base class.
+
+Uses zeromq to pass data upward, using PUSH/PULL.
+
+Passes data without touching it.
+"""
 
 # pylint: disable=too-many-arguments
 
