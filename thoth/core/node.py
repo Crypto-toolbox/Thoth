@@ -10,7 +10,7 @@ from abc import abstractmethod
 # Import Third-Party
 
 # Import Home-grown
-from hermes import Node
+from hermes import Node, Envelope
 
 # Init Logging Facilities
 log = logging.getLogger(__name__)
@@ -23,25 +23,33 @@ class DataNode(Node):
 
     @abstractmethod
     def process_frames(self, topic, data, ts):
-        """Process the frames received by the Connector."""
-        self.publish(topic, (data, ts))
+        """Publish the given data to channel, if it is available.
 
-    def pull(self, block=False, timeout=None):
+        The object must implement a ``publish(envelope)`` method, otherwise a
+        :exception:``NotImplementedError`` is raised.
+
+        :param channel: topic tree
+        :param data: Data Struct or string
+        :return: :class:`None`
+        """
+        envelope = Envelope(topic, self.name, (data, ts))
+        try:
+            self.publisher.publish(envelope)
+        except AttributeError:
+            raise NotImplementedError
+
+    # def pull(self, block=False, timeout=None):
 
     def run(self):
         """Execute main loop.
 
-        For data to be processed, it needs to have a certain format when it is returned from
+        For data to be processed, it is assumed to have a certain format when it is returned from
         the internal :attr:`thoth.DataNode.receiver` object, which is as follows:
-            (pair, dtype, data)
+            (topic, data, timestamp)
 
-        This is necessary for the :class:`thoth.DataNode` to be able to call the proper
-        publishing method as well as passing along the correct meta data
-        (channel name, for example). If there more or less than 3 values in the tuple, the
-        message will not be processed and instead is logged as an error.
+        Of course any other 3-item tuple would be valid as well; Once data is packaged by the
+        Connector class, we do not touch it again.
 
-        If the format is valid, data is published raw, as well as on the respective dtype channel,
-        if available.
         """
         while self._running:
             try:

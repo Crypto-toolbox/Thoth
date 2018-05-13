@@ -247,7 +247,7 @@ class WebSocketConnector(Thread):
 
         The socket type is :cls:`zmq.PUSH`.
 
-        :param topic: The topic of the message to be sent.
+        :param topic: The topic of the message to send.
         :param data: data to be pushed
         :param recv_at: float, time of reception
         :return:
