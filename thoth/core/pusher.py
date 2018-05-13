@@ -10,6 +10,7 @@ Passes data without touching it.
 # Import Built-Ins
 import logging
 import time
+import abc
 
 # Import Third-party
 from pysher import Pusher
@@ -70,8 +71,13 @@ class PusherConnector(Pusher):
         return self.q.get(block, timeout)
 
     # pylint: disable=unused-argument
+    @abc.abstractmethod
     def _base_callback(self, data, pair):
-        """Put data on respective queue."""
+        """Put data on respective queue.
+        
+        These a example implementations on how data is dispatched on pusher sockets.
+        Make sure to overrride them.
+        """
         def callback_a(data):
             """Put data on q with correct channel name."""
             print(data)
@@ -80,9 +86,9 @@ class PusherConnector(Pusher):
         def callback_b(data):
             """Put data on q with correct channel name."""
             print(data)
-            self.push('raw', data, time.time())
+            self.push('raw_2', data, time.time())
 
         channel1 = self.subscribe('Channel_A')
         channel1.bind('EVENT_NAME', callback_a)
         channel2 = self.subscribe('Channel_B')
-        channel2.bind('EVENT_NAME', callback_b)
+        channel2.bind('EVENT_NAME_2', callback_b)

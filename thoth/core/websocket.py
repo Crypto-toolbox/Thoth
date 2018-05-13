@@ -243,8 +243,11 @@ class WebSocketConnector(Thread):
             log.error("Cannot send payload! Connection not established!")
 
     def push(self, topic, data, recv_at):
-        """Pass data up to the client via the internal Queue().
+        """Push data up to the :cls:`DataNode` via the internal :cls:`zmq.Socket`.
 
+        The socket type is :cls:`zmq.PUSH`.
+
+        :param topic: The topic of the message to be sent.
         :param data: data to be pushed
         :param recv_at: float, time of reception
         :return:

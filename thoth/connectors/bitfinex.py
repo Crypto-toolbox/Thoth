@@ -85,7 +85,7 @@ class BitfinexConnector(WebsocketConnector):
         self.log.debug("_unpause(): Re-subscribing softly..")
         self._resubscribe(soft=True)
 
-    def pass_up(self, data, recv_at):
+    def _dispatch_data(self, data, recv_at):
         # Handle data
         if isinstance(data, dict):
             # This is a system message
@@ -138,14 +138,14 @@ class BitfinexConnector(WebsocketConnector):
         elif event in ('subscribed', 'unsubscribed', 'conf', 'auth', 'unauth'):
             self.log.debug("_system_handler(): Distributing %s to "
                            "_response_handler..", data)
-            self._response_handler(data, ts)
+            self._response_handler(event, data, ts)
         else:
             self.log.error("Unhandled event: %s, data: %s", event, data)
 
-    def _response_handler(self, data, ts):
+    def _response_handler(self,event, data, ts):
         """Handle responses to (un)subscribe and conf commands."""
         self.log.debug("_response_handler(): Passing %s to client..", data)
-        self.pass_up(data, ts)
+        self.push(event, data, ts)
 
     def _info_handler(self, data):
         """Handle INFO messages from the API and issues relevant actions."""
@@ -159,14 +159,14 @@ class BitfinexConnector(WebsocketConnector):
             self.log.info('Initialized Client on API Version %s', data['version'])
             return
 
-        codes = {'200000': raise_exception, '20051': self.reconnect, '20060': self._pause,
-                 '20061': self._unpause}
-        info_message = {'20000': 'Invalid User given! Please make sure the given ID is correct!',
-                        '20051': 'Stop/Restart websocket server '
+        codes = {200000: raise_exception, '20051': self.reconnect, '20060': self._pause,
+                 20061: self._unpause}
+        info_message = {20000: 'Invalid User given! Please make sure the given ID is correct!',
+                        20051: 'Stop/Restart websocket server '
                                  '(please try to reconnect)',
-                        '20060': 'Refreshing data from the trading engine; '
+                        20060: 'Refreshing data from the trading engine; '
                                  'please pause any acivity.',
-                        '20061': 'Done refreshing data from the trading engine.'
+                        20061: 'Done refreshing data from the trading engine.'
                                  ' Re-subscription advised.'}
         try:
             self.log.info(info_message[data['code']])
@@ -195,7 +195,8 @@ class BitfinexConnector(WebsocketConnector):
 
     def _data_handler(self, data, ts):
         """Handle data messages by passing them up to the client."""
-        self.pass_up(data, ts)
+        topic, *data = data
+        self.push(topic, data, ts)
 
     def _resubscribe(self, soft=False):
         """Resubscribes to all channels found in self.channel_configs.

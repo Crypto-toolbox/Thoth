@@ -24,7 +24,9 @@ class DataNode(Node):
     @abstractmethod
     def process_frames(self, topic, data, ts):
         """Process the frames received by the Connector."""
-        print(topic, data, ts)
+        self.publish(topic, (data, ts))
+
+    def pull(self, block=False, timeout=None):
 
     def run(self):
         """Execute main loop.
@@ -50,16 +52,6 @@ class DataNode(Node):
                 topic, data, ts = frames
             except ValueError as e:
                 log.exception(e)
-                log.error(msg)
+                log.error(frames)
                 continue
             self.process_frames(topic, data, ts)
-
-    def publish_raw(self, topic, data, ts):
-        """Publish the raw connection data.
-
-        :param topic: topic tree to publish data on
-        :param data: raw Connector message
-        :param ts: timestamp of when data was received by us
-        :return: None
-        """
-        return self.publish(topic, (data, ts))
